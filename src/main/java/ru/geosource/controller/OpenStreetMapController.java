@@ -1,27 +1,26 @@
 package ru.geosource.controller;
 
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.geosource.dto.CountyDto;
 import ru.geosource.dto.StateDto;
 import ru.geosource.service.OpenStreetMapService;
 
 import java.util.List;
-
+@Slf4j
 @RestController
 public class OpenStreetMapController {
     @Autowired
     private OpenStreetMapService openStreetMapService;
-    private static Logger log = Logger.getLogger(OpenStreetMapController.class);
 
-    @Cacheable(value = "cashForStateSearch", key = "#state")
-    @GetMapping("/state/{state}")
-    public List<StateDto> findByState(@PathVariable(value = "state") String state) {
-        List<StateDto> listState = null;
+    @Cacheable(value = "searchCache", key = "#state")
+    @GetMapping(value = "/search", params = "state")
+    public List<StateDto> findByState(@RequestParam(required = false) String state) {
+        List <StateDto> listState = null;
         try {
             listState = openStreetMapService.findByState(state);
         } catch (Exception e) {
@@ -30,12 +29,12 @@ public class OpenStreetMapController {
         return listState;
     }
 
-    @Cacheable(value = "cashForCountySearch", key = "#district")
-    @GetMapping("/{district}")
-    public List<CountyDto> findByCounty(@PathVariable(value = "district") String district) {
+    @Cacheable(value = "cacheForCountySearch", key = "#county")
+    @GetMapping(value = "/search", params = "county")
+    public List<CountyDto> findByCounty(@RequestParam(required = false) String county) {
         List<CountyDto> listCounty = null;
         try {
-            listCounty = openStreetMapService.findByCounty(district);
+            listCounty = openStreetMapService.findByCounty(county);
         } catch (Exception e) {
             log.error("Ошибка получения объекта по федеральному округу", e);
         }

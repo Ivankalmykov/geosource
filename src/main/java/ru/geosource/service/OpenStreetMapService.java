@@ -19,7 +19,7 @@ public class OpenStreetMapService {
     private RestTemplate restTemplate;
     @Value("${application.findByState}")
     private String urlForState;
-    @Value("${application.findByDistrict}")
+    @Value("${application.findByCounty}")
     private String urlForCounty;
 
 
@@ -28,8 +28,8 @@ public class OpenStreetMapService {
         return Arrays.asList(Objects.requireNonNull(stateEntity.getBody()));
     }
 
-    public List<CountyDto> findByCounty(@NonNull String district) {
-        ResponseEntity<CountyDto[]> countyEntity = restTemplate.getForEntity(urlForCounty, CountyDto[].class, district);
+    public List<CountyDto> findByCounty(@NonNull String county) {
+        ResponseEntity<CountyDto[]> countyEntity = restTemplate.getForEntity(urlForCounty, CountyDto[].class, county);
         return Arrays.asList(Objects.requireNonNull(countyEntity.getBody()));
     }
 }
