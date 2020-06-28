@@ -14,14 +14,13 @@ import ru.geosource.dto.StateDto;
 import java.util.Arrays;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GeosourceApplicationTests {
 	@Autowired
 	TestRestTemplate restTemplate;
-	@Test
-	void contextLoads() {
-	}
+
 
 	@Test
 	public void findByState(){
@@ -33,7 +32,7 @@ class GeosourceApplicationTests {
 		StateDto[] byState = new StateDto[1];
 		byState[0] = stateDto;
 
-		ResponseEntity<StateDto[]> forEntity = restTemplate.getForEntity("/searchByState/Самарская область", StateDto[].class);
+		ResponseEntity<StateDto[]> forEntity = restTemplate.getForEntity("/search?state=Самарская область", StateDto[].class);
 
 		assertThat(forEntity.getStatusCode(), is(HttpStatus.OK));
 		assertThat(forEntity.getBody(), is(byState));
@@ -49,7 +48,7 @@ class GeosourceApplicationTests {
 		CountyDto[] byCounty = new CountyDto[1];
 		byCounty[0] = countyDto;
 
-		ResponseEntity<CountyDto[]> forEntity = restTemplate.getForEntity("/ПФО", CountyDto[].class);
+		ResponseEntity<CountyDto[]> forEntity = restTemplate.getForEntity("/search?county=ПФО", CountyDto[].class);
 
 		assertThat(forEntity.getStatusCode(), is(HttpStatus.OK));
 		assertThat(forEntity.getBody(), is(byCounty));

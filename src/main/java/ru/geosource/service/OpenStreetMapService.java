@@ -9,27 +9,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.geosource.dto.CountyDto;
 import ru.geosource.dto.StateDto;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+
+import java.util.*;
 
 @Slf4j
 @Service
 public class OpenStreetMapService {
+    private final RestTemplate restTemplate;
+
     @Autowired
-    private RestTemplate restTemplate;
+    public OpenStreetMapService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     @Value("${application.findByState}")
     private String urlForState;
     @Value("${application.findByCounty}")
     private String urlForCounty;
 
-
     public List<StateDto> findByState(@NonNull String state) {
         ResponseEntity<StateDto[]> stateEntity = restTemplate.getForEntity(urlForState, StateDto[].class, state);
-        if (Arrays.asList(Objects.requireNonNull(stateEntity.getBody())).isEmpty()){
-            log.error("Объект c названием " + state + " не найден");
+        if (stateEntity.getStatusCodeValue() == 200 && !Arrays.asList(Objects.requireNonNull(stateEntity.getBody())).isEmpty()) {
+            return Arrays.asList(Objects.requireNonNull(stateEntity.getBody()));
         }
-        return Arrays.asList(Objects.requireNonNull(stateEntity.getBody()));
+
+        return new ArrayList<>(Collections.singletonList(new StateDto(null, null, null, "Объект с названием " + state + " не найден")));
     }
 
     public List<CountyDto> findByCounty(@NonNull String county) {

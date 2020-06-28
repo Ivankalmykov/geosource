@@ -14,8 +14,12 @@ import java.util.List;
 @Slf4j
 @RestController
 public class OpenStreetMapController {
+    private final OpenStreetMapService openStreetMapService;
+
     @Autowired
-    private OpenStreetMapService openStreetMapService;
+    public OpenStreetMapController(OpenStreetMapService openStreetMapService) {
+        this.openStreetMapService = openStreetMapService;
+    }
 
     @Cacheable(value = "searchCache", key = "#state")
     @GetMapping(value = "/search", params = "state")
