@@ -18,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GeosourceApplicationTests {
+
 	@Autowired
 	TestRestTemplate restTemplate;
 

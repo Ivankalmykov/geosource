@@ -1,7 +1,7 @@
 package ru.geosource.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,37 +11,23 @@ import ru.geosource.dto.StateDto;
 import ru.geosource.service.OpenStreetMapService;
 
 import java.util.List;
+
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class OpenStreetMapController {
-    private final OpenStreetMapService openStreetMapService;
 
-    @Autowired
-    public OpenStreetMapController(OpenStreetMapService openStreetMapService) {
-        this.openStreetMapService = openStreetMapService;
-    }
+    private final OpenStreetMapService openStreetMapService;
 
     @Cacheable(value = "searchCache", key = "#state")
     @GetMapping(value = "/search", params = "state")
-    public List<StateDto> findByState(@RequestParam(required = false) String state) {
-        List <StateDto> listState = null;
-        try {
-            listState = openStreetMapService.findByState(state);
-        } catch (Exception e) {
-            log.error("Ошибка получения объекта по области", e);
-        }
-        return listState;
+    public List<StateDto> findByState(@RequestParam String state) {
+        return openStreetMapService.findByState(state);
     }
 
     @Cacheable(value = "cacheForCountySearch", key = "#county")
     @GetMapping(value = "/search", params = "county")
-    public List<CountyDto> findByCounty(@RequestParam(required = false) String county) {
-        List<CountyDto> listCounty = null;
-        try {
-            listCounty = openStreetMapService.findByCounty(county);
-        } catch (Exception e) {
-            log.error("Ошибка получения объекта по федеральному округу", e);
-        }
-        return listCounty;
+    public List<CountyDto> findByCounty(@RequestParam String county) {
+        return openStreetMapService.findByCounty(county);
     }
 }

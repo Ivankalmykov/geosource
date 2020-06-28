@@ -1,46 +1,46 @@
 package ru.geosource.service;
 
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.geosource.dto.CountyDto;
 import ru.geosource.dto.StateDto;
+import ru.geosource.exception.CountyNotFoundException;
+import ru.geosource.exception.StateNotFoundException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OpenStreetMapService {
+
     private final RestTemplate restTemplate;
-
-    @Autowired
-    public OpenStreetMapService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
     @Value("${application.findByState}")
     private String urlForState;
     @Value("${application.findByCounty}")
     private String urlForCounty;
 
-    public List<StateDto> findByState(@NonNull String state) {
+    public List<StateDto> findByState(String state) {
         ResponseEntity<StateDto[]> stateEntity = restTemplate.getForEntity(urlForState, StateDto[].class, state);
-        if (stateEntity.getStatusCodeValue() == 200 && !Arrays.asList(Objects.requireNonNull(stateEntity.getBody())).isEmpty()) {
-            return Arrays.asList(Objects.requireNonNull(stateEntity.getBody()));
+        if (ArrayUtils.isNotEmpty(stateEntity.getBody())) {
+            return Arrays.asList(stateEntity.getBody());
+        } else {
+            throw new StateNotFoundException(state + " не найден");
         }
-
-        return new ArrayList<>(Collections.singletonList(new StateDto(null, null, null, "Объект с названием " + state + " не найден")));
     }
 
-    public List<CountyDto> findByCounty(@NonNull String county) {
+    public List<CountyDto> findByCounty(String county) {
         ResponseEntity<CountyDto[]> countyEntity = restTemplate.getForEntity(urlForCounty, CountyDto[].class, county);
-        if (Arrays.asList(Objects.requireNonNull(countyEntity.getBody())).isEmpty()){
-            log.error("Объект с названием " + county + " не найден");
+        if (ArrayUtils.isNotEmpty(countyEntity.getBody())) {
+            return Arrays.asList(countyEntity.getBody());
+        } else {
+            throw new CountyNotFoundException(county + " не найден");
         }
-        return Arrays.asList(Objects.requireNonNull(countyEntity.getBody()));
     }
 }
